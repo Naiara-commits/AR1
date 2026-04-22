@@ -27,15 +27,18 @@ namespace UnityEngine.XR.ARFoundation.Samples
         /// <summary>
         /// The object instantiated as a result of a successful raycast intersection with a plane.
         /// </summary>
-        public GameObject spawnedObject { get; private set; }
+        public List<GameObject> spawnedObjects { get; private set; } = new List<GameObject>();      //Cambio pq sino solo se cambian de sitio los cubos
+        public bool inputBlocked = false;       //Para que no se desactive el place on plane en el update
         bool m_Pressed;
         protected override void Awake()
         {
             base.Awake();
             m_RaycastManager = GetComponent<ARRaycastManager>();
         }
+       
         void Update()
         {
+            if (inputBlocked) return;
             if (Pointer.current == null || m_Pressed == false)
                 return;
             var touchPosition = Pointer.current.position.ReadValue();
@@ -45,16 +48,16 @@ namespace UnityEngine.XR.ARFoundation.Samples
                 // Raycast hits are sorted by distance, so the first one
                 // will be the closest hit.
                 var hitPose = s_Hits[0].pose;
-                if (spawnedObject == null)
-                {
-                    spawnedObject = Instantiate(m_PlacedPrefab, hitPose.position,
-                    hitPose.rotation);
-                }
-                else
-                {
-                    spawnedObject.transform.position = hitPose.position;
-                }
+                var spawned = Instantiate(m_PlacedPrefab, hitPose.position, hitPose.rotation);
+                spawnedObjects.Add(spawned);
             }
+        }
+        public void ClearAllObjects()
+        {
+            foreach (var obj in spawnedObjects)
+                if (obj != null) Destroy(obj);
+
+            spawnedObjects.Clear();
         }
         protected override void OnPress(Vector3 position) => m_Pressed = true;
         protected override void OnPressCancel() => m_Pressed = false;
