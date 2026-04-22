@@ -19,7 +19,7 @@ namespace UnityEngine.XR.ARFoundation.Samples
         public TMP_Dropdown prefabDropdown;
 
         public List<GameObject> prefabOptions = new List<GameObject>();
-        public bool inputBlocked = false;       //Para que no se desactive el place on plane en el update
+        
 
         void Start()
         {
@@ -40,7 +40,8 @@ namespace UnityEngine.XR.ARFoundation.Samples
         void Update()
         {
             planesCountText.text = $"Planos: {planeManager.trackables.count}";      //Cuenta los planos
-            placeOnPlane.enabled = !IsPointerOverUI();      // no puedes instanciar si hay boton donde apuntas
+                // no puedes instanciar si hay boton donde apuntas
+            placeOnPlane.inputBlocked = IsPointerOverUI();
         }
         void OnDropdownChanged(int index)
         {
